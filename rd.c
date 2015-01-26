@@ -257,6 +257,7 @@ B(double r, struct r1_test *rt)
 		abort();
 	}
 	int o = -e -1;
+	assert(o >= 0 && o < 52);
 	rt->efreq[o]++;
 	m = foo.u & ((1LL << 52) - 1);
 	rt->m_bits_set[o] |= m;
@@ -279,10 +280,9 @@ B(double r, struct r1_test *rt)
 		rt->min[o] = r;
 	if (r > rt->max[o])
 		rt->max[o] = r;
-#if 0
-	A(rt->min, 0.0, 1.0);
-	A(rt->max, 0.0, 1.0);
-#endif
+
+	A(rt->min[o], ldexp(0x1p0, e), ldexp(0x1p0, e + 1));
+	A(rt->max[o], ldexp(0x1p0, e), ldexp(0x1p0, e + 1));
 }
 
 uint64_t rX_bits_set;
