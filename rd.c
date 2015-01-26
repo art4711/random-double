@@ -212,7 +212,7 @@ A(double r, double min, double max)
 }
 
 struct r1_test {
-	int efreq[52];
+	uint64_t efreq[52];
 	uint64_t m_bits_set[52];
 	double min, max;
 };
@@ -328,13 +328,17 @@ main(int argc, char **argv)
 	}
 
 	for (i = 1; i < 52; i++) {
-		printf("freq1[%lld]: %d, expected: %llu, deviation %f\n",
+		if (r1a.efreq[i] == 0)
+			continue;
+		printf("freq1[%lld]: %llu, expected: %llu, deviation %f\n",
 		    -i, r1a.efreq[i], numruns / (1LLU << i),
 		    (double)((double)r1a.efreq[i] / ((double)numruns / (double)(1LLU << i))));
 	}
 
 	for (i = 1; i < 52; i++) {
-		printf("freq2[%lld]: %d, expected: %llu, deviation %f\n",
+		if (r1b.efreq[i] == 0)
+			continue;
+		printf("freq2[%lld]: %llu, expected: %llu, deviation %f\n",
 		    -i, r1b.efreq[i], numruns / (1LLU << i),
 		    (double)((double)r1b.efreq[i] / ((double)numruns / (double)(1LLU << i))));
 	}
