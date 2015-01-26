@@ -57,12 +57,13 @@ rX(uint64_t X)
  */
 
 /*
- * Let's also just limit ourselves IEEE 754 binary64 numbers known as
- * `double` in most C implementations. This code should be relatively
- * easily generalizable to any doubles that have a mantissa with less
- * than 64 bits or if you have more than that if you have an integer
- * type that is as big as your dobule. This is a proof of concept, not
- * a generic solution that will work everywhere every time.
+ * Let's also just limit ourselves to IEEE 754 binary64 numbers known
+ * as `double` in most C implementations. This code should be
+ * relatively easily generalizable to any doubles that have a mantissa
+ * with less than 64 bits or if you have more than that if you have an
+ * integer type that is as big as your dobule. This is a proof of
+ * concept, not a generic solution that will work everywhere every
+ * time.
  */
 
 /*
@@ -226,13 +227,11 @@ A(double r, double min, double max)
 }
 
 struct r1_test {
+	int mmset;
 	uint64_t efreq[52];
 	uint64_t m_bits_set[52];
-	int mmset;
 	double min[52], max[52];
 };
-struct r1_test r1a/* = { .min = 2.0, .max = -1.0 }*/;
-struct r1_test r1b/* = { .min = 2.0, .max = -1.0 }*/;
 
 static void
 B(double r, struct r1_test *rt)
@@ -311,8 +310,10 @@ check_1to2(double (*fn)(void), struct r1_test *rt)
 int
 main(int argc, char **argv)
 {
-	uint64_t i;
 	const uint64_t numruns = 1LL << 25;
+	struct r1_test r1a = { 0 };
+	struct r1_test r1b = { 0 };
+	uint64_t i;
 
 	for (i = 0; i < numruns / 10; i++) {
 		check_simple();
