@@ -97,6 +97,11 @@ r1to2check(void)
 	} a, b, c;
 	uint64_t r = rX(52);
 
+	/*
+	 * This assumes we're little-endian. Or actually i387 endian
+	 * because endianness for floating point isn't defined
+	 * anywhere. Or is it?
+	 */
 	a.d = 0x1p0;
 	a.u |= r;
 
