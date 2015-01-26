@@ -181,8 +181,8 @@ r0to1(void)
 	e = ffsll(rX(52));
 	if (e == 0)
 		return 0.0;
-	m = rX(53 - e) << (e - 1);
-	return ldexp(0x1p52 + m, -53 - e);
+	m = rX(52 - e + 1) << (e - 1);
+	return ldexp(0x1p52 + m, -52 - e);
 }
 
 /*
@@ -205,7 +205,7 @@ r0to1b(void)
 	if (e > 52 || e == 0)
 		return 0.0;
 	m = (r ^ (1 << (e - 1))) >> 1;
-	return ldexp(0x1p52 + m, -53 - e);
+	return ldexp(0x1p52 + m, -52 - e);
 }
 
 /*
@@ -227,10 +227,11 @@ A(double r, double min, double max)
 struct r1_test {
 	uint64_t efreq[52];
 	uint64_t m_bits_set[52];
-	double min, max;
+	int mmset;
+	double min[52], max[52];
 };
-struct r1_test r1a = { .min = 2.0, .max = -1.0 };
-struct r1_test r1b = { .min = 2.0, .max = -1.0 };
+struct r1_test r1a/* = { .min = 2.0, .max = -1.0 }*/;
+struct r1_test r1b/* = { .min = 2.0, .max = -1.0 }*/;
 
 static void
 B(double r, struct r1_test *rt)
@@ -255,16 +256,33 @@ B(double r, struct r1_test *rt)
 		printf("B(e): %d <= -52\n", e);
 		abort();
 	}
-	rt->efreq[-e - 1]++;
+	int o = -e -1;
+	rt->efreq[o]++;
 	m = foo.u & ((1LL << 52) - 1);
-	rt->m_bits_set[-e - 1] |= m;
+	rt->m_bits_set[o] |= m;
 	uint64_t expected_bits = ((1LL << 52) - 1);
-	expected_bits ^= (1LL << ((-e - 1) - 1)) - 1;
+	expected_bits ^= (1LL << (-e - 1)) - 1;
 	if (m & ~expected_bits) {
-		printf("B(m): unexpected bits set: 0x%llx, expected 0x%llx\n",
-		    m, expected_bits);
+		printf("B(m): unexpected bits set: 0x%llx, expected 0x%llx, diff 0x%llx\n",
+		    m, expected_bits, m & ~expected_bits);
 		abort();
 	}
+	if (!rt->mmset) {
+		int i;
+		for (i = 0; i < 52; i++) {
+			rt->min[i] = 2.0;
+			rt->max[i] = -1.0;
+		}
+		rt->mmset = 1;
+	}
+	if (r < rt->min[o])
+		rt->min[o] = r;
+	if (r > rt->max[o])
+		rt->max[o] = r;
+#if 0
+	A(rt->min, 0.0, 1.0);
+	A(rt->max, 0.0, 1.0);
+#endif
 }
 
 uint64_t rX_bits_set;
@@ -285,14 +303,8 @@ static void
 check_1to2(double (*fn)(void), struct r1_test *rt)
 {
 	double x = fn();
-	if (x < rt->min)
-		rt->min = x;
-	if (x > rt->max)
-		rt->max = x;
 	A(x, 0.0, 1.0);
 	B(x, rt);
-	A(rt->min, 0.0, 1.0);
-	A(rt->max, 0.0, 1.0);	
 }
 
 int
@@ -318,7 +330,7 @@ main(int argc, char **argv)
 
 	for (i = 1; i < 52; i++) {
 		uint64_t expected_bits = ((1LL << 52) - 1);
-		expected_bits ^= (1LL << (i - 1)) - 1;
+		expected_bits ^= (1LL << i) - 1;
 		/*
 		 * Check that the bits we expect to be used in the
 		 * mantissa are actually used and not more.
@@ -329,31 +341,33 @@ main(int argc, char **argv)
 		 * small sample size most of the time.
 		 */
 		if (r1a.m_bits_set[i] != expected_bits && r1a.efreq[i] > 25) {
-			printf("bits[%llu]: 0x%llx, expected 0x%llx, diff: 0x%llx\n",
+			printf("bits1[%llu]: 0x%llx, expected 0x%llx, diff: 0x%llx\n",
 			    i, r1a.m_bits_set[i], expected_bits,
 			    r1a.m_bits_set[i] ^ expected_bits);
 		}
 		if (r1b.m_bits_set[i] != expected_bits && r1b.efreq[i] > 25) {
-			printf("bits[%llu]: 0x%llx, expected 0x%llx, diff: 0x%llx\n",
+			printf("bits2[%llu]: 0x%llx, expected 0x%llx, diff: 0x%llx\n",
 			    i, r1b.m_bits_set[i], expected_bits,
 			    r1b.m_bits_set[i] ^ expected_bits);
 		}
 	}
 
-	for (i = 1; i < 52; i++) {
+	for (i = 0; i < 52; i++) {
 		if (r1a.efreq[i] == 0)
 			continue;
-		printf("freq1[%lld]: %llu, expected: %llu, deviation %f\n",
+		printf("freq1[%lld]: %llu, expected: %llu, deviation %f, range %f - %f\n",
 		    -i, r1a.efreq[i], numruns / (1LLU << i),
-		    (double)((double)r1a.efreq[i] / ((double)numruns / (double)(1LLU << i))));
+		    (double)((double)r1a.efreq[i] / ((double)numruns / (double)(1LLU << i))),
+		    r1a.min[i], r1a.max[i]);
 	}
 
-	for (i = 1; i < 52; i++) {
+	for (i = 0; i < 52; i++) {
 		if (r1b.efreq[i] == 0)
 			continue;
-		printf("freq2[%lld]: %llu, expected: %llu, deviation %f\n",
+		printf("freq2[%lld]: %llu, expected: %llu, deviation %f, range %f - %f\n",
 		    -i, r1b.efreq[i], numruns / (1LLU << i),
-		    (double)((double)r1b.efreq[i] / ((double)numruns / (double)(1LLU << i))));
+		    (double)((double)r1b.efreq[i] / ((double)numruns / (double)(1LLU << i))),
+		    r1b.min[i], r1b.max[i]);
 	}
 	return 0;
 }
