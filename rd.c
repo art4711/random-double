@@ -131,9 +131,9 @@ r2range(int X)
  *
  * There are 2^52 possible numbers in the [0.5,1.0) range and the
  * range has a 2^-1 probablity to be picked, this means that the
- * probability of any number in that range is 2^53. Since we don't
+ * probability of any number in that range is 2^-53. Since we don't
  * want any number to be more likely to be picked, it means that the
- * probability for 0 should be 2^53.
+ * probability for 0 should be 2^-53.
  *
  * This gives us a very simple way to pick our exponent. Generate a 52
  * bit number, find the lowest set bit (1 indexed) and zero minus that
