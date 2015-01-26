@@ -28,17 +28,18 @@
  *
  * The Stackoverflow questions I can find about the topic have
  * obviously flawed answers. `((double)rand()/(double)RAND_MAX)` will
- * not give us a uniform distribution. This is not even under
- * discussion here. If you think this is a good way to generate
- * uniformly distributed random doubles, either read on or just go
- * away.
- *
- * I have a good random source. That's not part of the problem.
- * Assume that my source of random bits is perfect and is a function
- * that returns a perfectly random number in the range [0,2^X) and
- * looks like this (for X <= 64):
+ * neither give us a random number, nor will the distribution be
+ * paricularly good. This is not even under discussion here. If you
+ * think this is a good way to generate uniformly distributed random
+ * doubles, either read on or just go away.
  */
 
+/*
+ * I have a good random source. That's not part of the problem.
+ * Assume that my source of random bits is perfect and is a function
+ * that returns a number in the range [0,2^X) and looks like this (for
+ * X <= 64):
+ */
 static uint64_t
 rX(uint64_t X)
 {
@@ -47,17 +48,27 @@ rX(uint64_t X)
 	arc4random_buf(&res, sizeof(res));
 	return res & ((1ULL << X) - 1);
 }
+/*
+ * If your operating system does not provide `arc4random_buf` get
+ * a better operating system or substitute this function for your
+ * favourite randomness source.
+ */
 
 /*
  * Let's also just limit ourselves IEEE 754 binary64 numbers known as
- * `double` in most C implementations.
- *
+ * `double` in most C implementations. This code should be relatively
+ * easily generalizable to any doubles that have a mantissa with less
+ * than 64 bits or if you have more than that if you have an integer
+ * type that is as big as your dobule. This is a proof of concept, not
+ * a generic solution that will work everywhere every time.
+ */
+
+/*
  * We know that we have a 52 bit mantissa and that makes the numbers
  * in the range [2^52,2^53) have integer precision . So a uniformly
  * distributed random double in that range is trivial to generate
  * without resorting to bit fiddling:
  */
-
 double
 r52to53(void)
 {
@@ -100,7 +111,7 @@ r1to2check(void)
 	/*
 	 * This assumes we're little-endian. Or actually i387 endian
 	 * because endianness for floating point isn't defined
-	 * anywhere. Or is it?
+	 * anywhere.
 	 */
 	a.d = 0x1p0;
 	a.u |= r;
@@ -114,7 +125,7 @@ r1to2check(void)
 
 /*
  * It doesn't take much imagination to map this to any [2^X,2^(X+1))
- * range.
+ * range:
  */
 double
 r2range(int X)
