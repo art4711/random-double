@@ -204,7 +204,8 @@ r0to1b(void)
 	uint64_t m;
 	if (e > 52 || e == 0)
 		return 0.0;
-	m = (r ^ (1 << (e - 1))) >> 1;
+	/* Shift out the bit we don't want set. */
+	m = (r >> e) << (e - 1);
 	return ldexp(0x1p52 + m, -52 - e);
 }
 
