@@ -29,9 +29,9 @@
  * The Stackoverflow questions I can find about the topic have
  * obviously flawed answers. `((double)rand()/(double)RAND_MAX)` will
  * not give us a uniform distribution. This is not even under
- * discussion here. If you think this is the correct way to generate
+ * discussion here. If you think this is a good way to generate
  * uniformly distributed random doubles, either read on or just go
- * away. Please don't comment.
+ * away.
  *
  * I have a good random source. That's not part of the problem.
  * Assume that my source of random bits is perfect and is a function
@@ -49,8 +49,8 @@ rX(uint64_t X)
 }
 
 /*
- * Let's also just limit ourselves IEEE 754 binary64 numbers, also
- * known as `double` in most C implementations.
+ * Let's also just limit ourselves IEEE 754 binary64 numbers known as
+ * `double` in most C implementations.
  *
  * We know that we have a 52 bit mantissa and that makes the numbers
  * in the range [2^52,2^53) have integer precision . So a uniformly
@@ -127,8 +127,7 @@ r2range(int X)
  *
  * To get us a uniformly distributed number in the [0,1) range, we
  * have 1/2 chance to get a number in the [0.5,1.0) range, 1/4
- * [0.25,0.5), etc. The ranges we're dealing with are 2^0 to 2^-1022
- * and a special case for 0.
+ * [0.25,0.5), etc.
  *
  * There are 2^52 possible numbers in the [0.5,1.0) range and the
  * range has a 2^-1 probablity to be picked, this means that the
@@ -139,11 +138,11 @@ r2range(int X)
  * This gives us a very simple way to pick our exponent. Generate a 52
  * bit number, find the lowest set bit (1 indexed) and zero minus that
  * bit is our exponent. If no bits are set, we special case and return
- * 0.0. This works because the probability of each bit being set is
- * 1/2, this means that bit 1 has 1/2 probability of being picked, bit
- * 2 1/4, etc. The ffsll function is just perfect for this.
- * Unfortunately POSIX only has ffs, but everyone (I care about)
- * implements ffsll.
+ * 0.0 (this has a 2^-53 probability). The probability of each bit
+ * being set is 1/2, this means that bit 1 has 1/2 probability of
+ * being picked, bit 2 1/4, etc. The ffsll function is just perfect
+ * for this.  Unfortunately POSIX only has ffs, but everyone (I care
+ * about) implements ffsll.
  *
  * The only question that remains is the mantissa. On one hand it
  * shouldn't hurt to set the mantissa to completely random bits. We
@@ -152,7 +151,7 @@ r2range(int X)
  * elegant about having all the pickable numbers to be at an equal
  * distance from each other. Intuitively, this should be as simple
  * as not setting the lower bits of the mantissa (or should they
- * be all 1?).
+ * be all 1?). XXX - this needs to be verified.
  */
 double
 r0to1(void)
