@@ -1,6 +1,6 @@
 # Generating random doubles #
 
-The whole documentation is in comments in (rd.c)[rd.c].
+The whole documentation is in comments in [rd.c](rd.c).
 
 ## TODO ##
 
