@@ -113,7 +113,8 @@ r1to2check(void)
 }
 
 /*
- * It doesn't take much imagination to map this to any [2^X,2^(X+1)) range.
+ * It doesn't take much imagination to map this to any [2^X,2^(X+1))
+ * range.
  */
 double
 r2range(int X)
@@ -154,9 +155,9 @@ r2range(int X)
  * would get the worst entropy for 0 and [0.5,1.0), every other range
  * would be less predictable. On the other hand, there's something
  * elegant about having all the pickable numbers to be at an equal
- * distance from each other. Intuitively, this should be as simple
- * as not setting the lower bits of the mantissa (or should they
- * be all 1?). XXX - this needs to be verified.
+ * distance from each other. Intuitively, this should be as simple as
+ * not setting the lower bits of the mantissa (or should they be all
+ * 1?). XXX - this needs to be verified.
  */
 double
 r0to1(void)
@@ -247,7 +248,8 @@ B(double r, struct r1_test *rt)
 	uint64_t expected_bits = ((1LL << 52) - 1);
 	expected_bits ^= (1LL << ((-e - 1) - 1)) - 1;
 	if (m & ~expected_bits) {
-		printf("B(m): unexpected bits set: 0x%llx, expected 0x%llx\n", m, expected_bits);
+		printf("B(m): unexpected bits set: 0x%llx, expected 0x%llx\n",
+		    m, expected_bits);
 		abort();
 	}
 }
@@ -289,7 +291,9 @@ main(int argc, char **argv)
 	for (i = 0; i < numruns / 10; i++) {
 		check_simple();
 	}
-	assert(rX_bits_set == 0xfffffffffffffLLU);	/* should work most of the time. */
+
+	/* should work most of the time. */
+	assert(rX_bits_set == 0xfffffffffffffLLU);
 
 	for (i = 0; i < numruns; i++) {
 		check_1to2(r0to1, &r1a);
@@ -298,21 +302,41 @@ main(int argc, char **argv)
 	for (i = 0; i < numruns; i++) {
 		check_1to2(r0to1b, &r1b);
 	}
+
 	for (i = 1; i < 52; i++) {
 		uint64_t expected_bits = ((1LL << 52) - 1);
 		expected_bits ^= (1LL << (i - 1)) - 1;
-		if (r1a.m_bits_set[i] != expected_bits && r1a.efreq[i] > 25)
-			printf("bits[%llu]: 0x%llx, expected 0x%llx, diff: 0x%llx\n", i, r1a.m_bits_set[i], expected_bits, r1a.m_bits_set[i] ^ expected_bits);
-		if (r1b.m_bits_set[i] != expected_bits && r1b.efreq[i] > 25)
-			printf("bits[%llu]: 0x%llx, expected 0x%llx, diff: 0x%llx\n", i, r1b.m_bits_set[i], expected_bits, r1b.m_bits_set[i] ^ expected_bits);
+		/*
+		 * Check that the bits we expect to be used in the
+		 * mantissa are actually used and not more.
+		 *
+		 * We only check if that particular exponent has been
+		 * used at least 25 times. Why 25? Because that shut
+		 * up the false positives for the numbers with too
+		 * small sample size most of the time.
+		 */
+		if (r1a.m_bits_set[i] != expected_bits && r1a.efreq[i] > 25) {
+			printf("bits[%llu]: 0x%llx, expected 0x%llx, diff: 0x%llx\n",
+			    i, r1a.m_bits_set[i], expected_bits,
+			    r1a.m_bits_set[i] ^ expected_bits);
+		}
+		if (r1b.m_bits_set[i] != expected_bits && r1b.efreq[i] > 25) {
+			printf("bits[%llu]: 0x%llx, expected 0x%llx, diff: 0x%llx\n",
+			    i, r1b.m_bits_set[i], expected_bits,
+			    r1b.m_bits_set[i] ^ expected_bits);
+		}
 	}
 
 	for (i = 1; i < 52; i++) {
-		printf("freq1[%llu]: %d, expected: %llu, deviation %f\n", -i, r1a.efreq[i], numruns / (1LLU << i), (double)((double)r1a.efreq[i] / ((double)numruns / (double)(1LLU << i))));
+		printf("freq1[%lld]: %d, expected: %llu, deviation %f\n",
+		    -i, r1a.efreq[i], numruns / (1LLU << i),
+		    (double)((double)r1a.efreq[i] / ((double)numruns / (double)(1LLU << i))));
 	}
 
 	for (i = 1; i < 52; i++) {
-		printf("freq2[%llu]: %d, expected: %llu, deviation %f\n", -i, r1b.efreq[i], numruns / (1LLU << i), (double)((double)r1b.efreq[i] / ((double)numruns / (double)(1LLU << i))));
+		printf("freq2[%lld]: %d, expected: %llu, deviation %f\n",
+		    -i, r1b.efreq[i], numruns / (1LLU << i),
+		    (double)((double)r1b.efreq[i] / ((double)numruns / (double)(1LLU << i))));
 	}
 	return 0;
 }
