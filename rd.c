@@ -355,18 +355,18 @@ main(int argc, char **argv)
 	for (i = 0; i < 52; i++) {
 		if (r1a.efreq[i] == 0)
 			continue;
-		printf("freq1[%lld]: %llu, expected: %llu, deviation %f, range %f - %f\n",
-		    -i, r1a.efreq[i], numruns / (1LLU << i),
-		    (double)((double)r1a.efreq[i] / ((double)numruns / (double)(1LLU << i))),
+		uint64_t expected = numruns / (1LLU << (i + 1));
+		printf("freq1[%lld]: %llu, expected: %llu, deviation %.2f, range %f - %f\n",
+		    -i, r1a.efreq[i], expected, (double)r1a.efreq[i] / (double)expected,
 		    r1a.min[i], r1a.max[i]);
 	}
 
 	for (i = 0; i < 52; i++) {
 		if (r1b.efreq[i] == 0)
 			continue;
-		printf("freq2[%lld]: %llu, expected: %llu, deviation %f, range %f - %f\n",
-		    -i, r1b.efreq[i], numruns / (1LLU << i),
-		    (double)((double)r1b.efreq[i] / ((double)numruns / (double)(1LLU << i))),
+		uint64_t expected = numruns / (1LLU << (i + 1));
+		printf("freq2[%lld]: %llu, expected: %llu, deviation %.2f, range %f - %f\n",
+		    -i, r1b.efreq[i], expected, (double)r1b.efreq[i] / (double)expected,
 		    r1b.min[i], r1b.max[i]);
 	}
 	return 0;
