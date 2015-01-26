@@ -46,6 +46,8 @@ rX(uint64_t X)
 	uint64_t res;
 	assert(X > 0 && X < 65);
 	arc4random_buf(&res, sizeof(res));
+	if (X == 64)
+		return res;
 	return res & ((1ULL << X) - 1);
 }
 /*
