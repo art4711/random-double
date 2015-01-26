@@ -286,7 +286,7 @@ int
 main(int argc, char **argv)
 {
 	uint64_t i;
-	const uint64_t numruns = 10000000;
+	const uint64_t numruns = 1LL << 25;
 
 	for (i = 0; i < numruns / 10; i++) {
 		check_simple();
