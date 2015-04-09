@@ -269,7 +269,7 @@ rd_positive(double from, double to)
 	double count = (to - from) / step;		/* Leap of faith, I actually don't know if this will always be correct. */
 
 	assert(count <= (1LL << 53));
-	return from + (double)(r_uniform((uint64_t)count + 1))* step;
+	return from + (double)(r_uniform((uint64_t)count)) * step;
 }
 
 /*
@@ -279,7 +279,7 @@ static void
 test_rd_positive_n(int buckets)
 {
 	int attempts = 10000000;
-	double from = 0x1p52, to = from + buckets - 1;
+	double from = 0x1p52, to = from + buckets;
 	int bucket[buckets];
 	int i;
 
