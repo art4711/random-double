@@ -247,6 +247,15 @@ test_ranges(void)
 	r = numbers_between(0x1p55, 0x1p55 + 25);
 	assert(r == 3);
 
+	r = numbers_between(0, 0x1p52 + 1000);
+	assert(r == (1LL << 52) + 1000);
+
+	r = numbers_between(3, 0x1p52 + 1000);
+	assert(r == (1LL << 52) + 997);
+
+	r = numbers_between(0, 0x1p53 + 1000);
+	assert(r == (1LL << 52) + 500);
+
 	/* 
 	 * This test below actually gives us separate verification
 	 * that my stumbling math in rd.c about the numbers in [0,1)
