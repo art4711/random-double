@@ -50,6 +50,7 @@ rX(uint64_t X)
 		return res;
 	return res & ((1ULL << X) - 1);
 }
+
 /*
  * If your operating system does not provide `arc4random_buf` get
  * a better operating system or substitute this function for your
@@ -171,7 +172,9 @@ r2range(int X)
  * elegant about having all the pickable numbers to be at an equal
  * distance from each other. Intuitively, this should be as simple as
  * not setting the lower bits of the mantissa (or should they be all
- * 1?). XXX - this needs to be verified.
+ * 1? This has been verified in arbitrary_range.c and unless that
+ * completely different algorithm is also wrong, they correct answer is
+ * that they should all be 0).
  */
 double
 r0to1(void)
