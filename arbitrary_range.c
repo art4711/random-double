@@ -84,7 +84,8 @@ r0to1(void)
  */
 
 /*
- * Let's just start with a completely naive implementation that seems to be industry standard (see urd.cxx).
+ * Let's just start with the completely naive implementation that
+ * seems to be industry standard (see urd.cxx).
  */
 
 static double
@@ -149,17 +150,18 @@ test_rd_naive(void)
  * only be achieved if the number of unique pigeons is a multiple of
  * pigeonholes. In fact to make our life simple, let's just say that
  * we want the function mapping pigeons to pigeonholes to be
- * bijective.  It's not strictly necessary, it's enough that the
+ * bijective. It's not strictly necessary, it's enough that the
  * function is surjective and <my knowledge of set theory ends here,
- * so fuck it, just make it bijective>.
+ * so fuck it, just make it bijective because it's easier to reason
+ * about>.
  *
- * Since we can count the number the possible pigeonholes [from, to)
- * that a double can represent all we need is a function that
- * generates a random pigeon with a number [0, count). So we need a
- * function that returns random number [0,x). This is of course a
- * solved problem, but I'll reimplement it here because I want 64 bit
- * numbers and the standard function I have in mind `arc4random_uniform`
- * only deals with 32 bit numbers.
+ * Since we can count the number of the possible pigeonholes in the
+ * range [from, to) that a double can represent all we need is a
+ * function that gives us a random pigeon with a number [0, count). So
+ * we need a function that returns random number [0,x). This is of
+ * course a solved problem, but I'll reimplement it here because I
+ * want 64 bit numbers and the standard function I have in mind
+ * `arc4random_uniform` only deals with 32 bit numbers.
  *
  * Below is a copy from openbsd:src/lib/libc/crypt/arc4random_uniform.c
  * adapted to 64 bit numbers.
@@ -214,7 +216,8 @@ r_uniform(uint64_t upper_bound)
  * possible numbers we can generate is the distance between the
  * numbers in the highest possible range. So in the [0,1) range we
  * know that the biggest distance between numbers is in the [0.5,1)
- * range because that floating point number has the highest exponent.
+ * range because those floating point numbers have the highest
+ * exponent.
  *
  * The C standard gives us a tool for this exact purpose: nextafter.
  */
@@ -233,7 +236,7 @@ numbers_between(double from, double to)
 }
 
 /*
- * Let's just verify that I'm not full of shit:
+ * Let's just verify that I'm not entirely full of shit:
  */
 static void
 test_ranges(void)
@@ -245,8 +248,9 @@ test_ranges(void)
 	assert(r == 3);
 
 	/* 
-	 * This test below actually gives us separate verification that my
-	 * stumbling math about the numbers in [0,1) range was correct.
+	 * This test below actually gives us separate verification
+	 * that my stumbling math in rd.c about the numbers in [0,1)
+	 * range was correct.
 	 */
 	r = numbers_between(0, 1);
 	assert(r == (1LL << 53));

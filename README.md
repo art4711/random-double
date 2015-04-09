@@ -26,3 +26,17 @@ farts are at least consistent.
    arbitrary_range, except that we find the biggest absolute value of
    (from,to), use that to find the step and count and do some sign
    flipping in the right place. But that's for another day.
+
+## DISCLAIMER ##
+
+Please notice that I'm not claiming that anything above makes sense or
+that the tests are even close to being comprehensive. A programmer
+who tests his own edge cases is like an author writing his own book
+reviews.
+
+To be useful this would require vastly more testing and independent
+verificaiton from someone who actually understands set theory and ieee
+754 floating point numbers. I can confidently say that I know neither,
+but as the industry standard on stackoverflow and the c++ libraries
+seems to indicate, something somehing something one-eyed man and the
+land of the blind.
