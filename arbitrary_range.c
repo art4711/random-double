@@ -230,7 +230,18 @@ numbers_between(double from, double to)
 	double count = (to - from) / step;		/* Leap of faith, I actually don't know if this will always be correct. */
 	uint64_t r = count;
 
-	assert((double)r == count);			/* the integer conversion should have been accurate. */
+	/*
+	 * The conversion to uint64_t should be accurate. Every
+	 * integer between 0 and 2^53 can be expressed in a double and
+	 * we can't get a higher count than 2^53 because that's the
+	 * count we get when to is at the end of a range.
+	 *
+	 * As far as I can see we can only get a higher count when we
+	 * extend this to negative ranges because then the count can
+	 * become 2^54 in the worst case. We'll cross that bridge when
+	 * we get there.
+	 */
+	assert((double)r == count);
 
 	return r;
 }
@@ -255,6 +266,18 @@ test_ranges(void)
 
 	r = numbers_between(0, 0x1p53 + 1000);
 	assert(r == (1LL << 52) + 500);
+
+	r = numbers_between(0, 0x1p53);
+	assert(r == (1LL << 53));
+
+	r = numbers_between(0, 0x1p53 - 1);
+	assert(r == (1LL << 53) - 1);
+
+	r = numbers_between(0, 0x1p53 + 1);
+	assert(r == (1LL << 53));
+
+	r = numbers_between(0, 0x1p53 + 2);
+	assert(r == (1LL << 52) + 1);
 
 	/* 
 	 * This test below actually gives us separate verification
