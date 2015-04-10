@@ -40,7 +40,7 @@ test_minus_one(void)
 	/*
 	 * Here, we step through the first 10 numbers smaller than 2,
 	 * subtract 1.0 from them and compare that to the first 10
-	 * numbers smaller than 2. If mapping from [1,2) to [0,1)
+	 * numbers smaller than 1. If mapping from [1,2) to [0,1)
 	 * worked by subtracting 1.0 there should be no diff.
 	 */
 	less_than_two = nextafter(2.0, 0.0);
