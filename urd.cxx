@@ -25,31 +25,59 @@
  * floating point numbers, let's see how it performs.
  */
 
-#define RANGE 3
-
 int
-main()
+main(int argc, char **argv)
 {
 	std::default_random_engine gen;
-	double from = 0x1p52, to = from + RANGE - 1;
+	double from, step, to;
+	int range = 3;
+
+	switch (argc) {
+	case 1:
+		from = 1.0;
+		break;
+	default:
+	case 3:
+		range = atoi(argv[2]);
+	case 2:
+		from = atof(argv[1]);
+		break;
+	}
+
+	/*
+	 * Calculate the nearest representable number after from.
+	 * add 1.0 to deal with from being 0 (shouldn't cause overflow
+	 * because at that range 1.0 means nothing).
+	 */
+	step = nextafter(from, (from + 1.0) * 2.0) - from;
+	/*
+	 * uniform_real_distribution should return [from,to), but they
+	 * all return [from,to], so that's why 1 is subtracted from range.
+	 */
+	to = from + step * (range - 1);
+
+	printf("%a %a %a %d\n", from, to, step, range);
+
 	std::uniform_real_distribution<double> dis(from, to);
-	long long bucket[RANGE] = { 0 };
+	int bucket[range];
 	int i;
 
-	for (i = 0; i < 1000000; i++) {
+	for (i = 0; i < range; i++) {
+		bucket[i] = 0;
+	}
+
+	for (i = 0; i < 100 * range; i++) {
 		double r = dis(gen);
-		unsigned int b = (int)(r - from);
-		if (b >= RANGE) {
+		unsigned int b = (int)((r - from)/step);
+		if (b >= range) {
 			printf("foo: %d %f\n", b, r);
 		}
-		assert(b < RANGE);
+		assert(b < range);
 		bucket[b]++;
 	}
 
-	for (i = 0; i < RANGE; i++) {
-		printf("%lld\n", bucket[i]);
+	for (i = 0; i < range; i++) {
+		printf("%d\n", bucket[i]);
 	}
-
-
 	return 0;
 }
