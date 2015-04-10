@@ -47,7 +47,7 @@ test_minus_one(void)
 	less_than_one = nextafter(1.0, 0.0);
 	for (i = 0; i < 10; i++) {
 		double diff = (less_than_two - 1.0) - less_than_one;
-		printf("%e %e %e %e\n", less_than_two, less_than_two - 1.0, less_than_one, diff);
+		printf("%a %a %a %a\n", less_than_two, less_than_two - 1.0, less_than_one, diff);
 		less_than_two = nextafter(less_than_two, 0.0);
 		less_than_one = nextafter(less_than_one, 0.0);
 	}
@@ -61,7 +61,7 @@ test_minus_one(void)
 	for (i = 0; i < 10; i++) {
 		less_than_one = nextafter(less_than_one, 0.0);
 		double diff = (less_than_two - 1.0) - less_than_one;
-		printf("%e %e %e %e\n", less_than_two, less_than_two - 1.0, less_than_one, diff);
+		printf("%a %a %a %a\n", less_than_two, less_than_two - 1.0, less_than_one, diff);
 		less_than_two = nextafter(less_than_two, 0.0);
 		less_than_one = nextafter(less_than_one, 0.0);
 	}	
