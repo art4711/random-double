@@ -38,5 +38,4 @@ To be useful this would require vastly more testing and independent
 verificaiton from someone who actually understands set theory and ieee
 754 floating point numbers. I can confidently say that I know neither,
 but as the industry standard on stackoverflow and the c++ libraries
-seems to indicate, something something something one-eyed man and the
-land of the blind.
+seems to indicate, neither do most other people.
